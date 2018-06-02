@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Task;
-use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +18,11 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $taskDays = Task::orderBy('order', 'asc')
+            ->get()
+            ->groupBy('day');
+
+        return view('tasks.index', compact('taskDays'));
     }
 
     /**
@@ -24,29 +32,24 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        return view('tasks.create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
-        //
-    }
+        request()->validate([
+            'description' => 'required',
+            'day' => 'required',
+        ]);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Task  $task
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Task $task)
-    {
-        //
+        Task::create(request()->all());
+
+        return back();
     }
 
     /**
@@ -57,19 +60,50 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        //
+        return view('tasks.edit', compact('task'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Task $task)
+    public function update(Task $task)
     {
-        //
+        request()->validate([
+            'description' => 'required',
+            'day' => 'required',
+        ]);
+
+        $task->update(request()->all());
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task updated');
+    }
+
+    public function updateOrder()
+    {
+        // Make a flat array
+        $orderedTasks = call_user_func_array('array_merge', request()->get('tasks'));
+
+        $tasks = Task::all();
+
+        foreach ($tasks as $task) {
+            $task->timestamps = false;
+
+            foreach ($orderedTasks as $orderedTask) {
+                if ($orderedTask['id'] === $task->id) {
+                    $task->update([
+                        'order' => $orderedTask['order'],
+                        'day' => $orderedTask['day'],
+                    ]);
+                }
+            }
+        }
+
+        return response('Update successful', 200);
+
     }
 
     /**
