@@ -1,10 +1,10 @@
 <template>
     <div id="task-list">
         <div v-for="(tasks, day) in groupedTasks">
-            <strong>{{ day }}</strong>
-            <draggable :list="tasks" :options="{group: 'undone'}" @change="update">
+            <strong>{{ showDay(day) }}</strong>
+            <draggable :list="tasks" :options="{group: 'undone', handle: '.drag-area'}" @change="update">
                 <div v-for="task in tasks" class="card mb-1">
-                    <div class="card-body">{{ task.description }}</div>
+                    <task :item="task"></task>
                 </div>
             </draggable>
         </div>
@@ -13,6 +13,7 @@
 
 <script>
 import draggable from 'vuedraggable';
+import Task from './Task';
 
 export default {
     props: ['taskDays'],
@@ -24,14 +25,12 @@ export default {
     },
 
     components: {
-        draggable
+        Task, draggable
     },
 
     methods: {
 
         update() {
-            console.log(this.groupedTasks);
-
             this.updateIndices();
 
             axios.patch('/tasks/updateOrder', {
@@ -39,6 +38,9 @@ export default {
             })
         },
 
+        /**
+         * Recalculates all indizes and updates them
+         */
         updateIndices() {
 
             let newIndex = 1;
@@ -56,7 +58,57 @@ export default {
 
             }
 
-        }
+        },
+
+        /**
+         * Deletes a task from database and the grouped task object
+         */
+        deleteTask(task) {
+            if (!confirm('Wirklich löschen?')) {
+                return;
+            }
+
+            axios.delete('/tasks/' + task.id)
+                .then(() => {
+                    for (let index in this.groupedTasks[task.day]) {
+                        if (this.groupedTasks[task.day][index].id === task.id) {
+                            this.groupedTasks[task.day].splice(index, 1);
+                        }
+                    }
+                });
+        },
+
+        /**
+         * Parses the day and produces a better readable output
+         *
+         * @param {String} day
+         */
+        showDay(day) {
+            return moment(day, 'YYYY-MM-DD').format('dddd, DD.MM.YYYY');
+        },
+
     },
 }
 </script>
+
+<style lang="scss" scoped>
+    .task-row {
+        padding: 0.5rem;
+
+        label {
+            margin: 0;
+        }
+
+        .drag-handle {
+            cursor: pointer;
+        }
+
+        .description {
+            &.finished {
+                text-decoration: line-through;
+            }
+
+            user-select: none;
+        }
+    }
+</style>

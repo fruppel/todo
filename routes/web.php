@@ -7,4 +7,5 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::patch('tasks/updateOrder', 'TaskController@updateOrder');
+Route::patch('tasks/updateFinished/{task}', 'TaskController@updateFinished');
 Route::resource('tasks', 'TaskController');

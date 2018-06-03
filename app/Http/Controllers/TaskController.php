@@ -18,11 +18,20 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $taskDays = Task::orderBy('order', 'asc')
+        $taskDays = Task::whereFinished(false)
+            ->orderBy('day', 'asc')
+            ->orderBy('order', 'asc')
             ->get()
             ->groupBy('day');
 
-        return view('tasks.index', compact('taskDays'));
+        $archivedTasks = Task::whereFinished(true)
+            ->orderBy('day', 'desc')
+            ->orderBy('order', 'asc')
+            ->get()
+            ->groupBy('day');;
+
+
+        return view('tasks.index', compact('taskDays', 'archivedTasks'));
     }
 
     /**
@@ -71,6 +80,8 @@ class TaskController extends Controller
      */
     public function update(Task $task)
     {
+        dd($task);
+
         request()->validate([
             'description' => 'required',
             'day' => 'required',
@@ -82,6 +93,11 @@ class TaskController extends Controller
             ->with('success', 'Task updated');
     }
 
+    /**
+     * Updates the ordering of all tasks
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
     public function updateOrder()
     {
         // Make a flat array
@@ -103,7 +119,14 @@ class TaskController extends Controller
         }
 
         return response('Update successful', 200);
+    }
 
+    public function updateFinished(Task $task)
+    {
+        $task->finished = request()->get('finished');
+        $task->save();
+
+        return response('Update successful', 200);
     }
 
     /**
@@ -114,6 +137,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $task->delete();
+        return response('Task deleted', 200);
     }
 }

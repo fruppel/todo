@@ -18,6 +18,7 @@ class CreateTasksTable extends Migration
             $table->string('description');
             $table->date('day')->nullable();
             $table->integer('order')->nullable();
+            $table->boolean('finished')->default(false);
             $table->timestamps();
         });
     }
