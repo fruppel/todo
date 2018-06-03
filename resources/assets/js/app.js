@@ -7,3 +7,5 @@ Vue.component('tasks', require('./components/Tasks'));
 const app = new Vue({
     el: '#app'
 });
+
+window.scrollTo(0,1);
