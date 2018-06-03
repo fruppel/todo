@@ -18,20 +18,20 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $taskDays = Task::whereFinished(false)
+        $todo = Task::whereFinished(false)
             ->orderBy('day', 'asc')
             ->orderBy('order', 'asc')
             ->get()
             ->groupBy('day');
 
-        $archivedTasks = Task::whereFinished(true)
+        $archived = Task::whereFinished(true)
             ->orderBy('day', 'desc')
             ->orderBy('order', 'asc')
             ->get()
             ->groupBy('day');;
 
 
-        return view('tasks.index', compact('taskDays', 'archivedTasks'));
+        return view('tasks.index', compact('todo', 'archived'));
     }
 
     /**
@@ -58,7 +58,7 @@ class TaskController extends Controller
 
         Task::create(request()->all());
 
-        return back();
+        return redirect()->route('tasks.index');
     }
 
     /**
@@ -80,8 +80,6 @@ class TaskController extends Controller
      */
     public function update(Task $task)
     {
-        dd($task);
-
         request()->validate([
             'description' => 'required',
             'day' => 'required',

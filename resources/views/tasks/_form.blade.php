@@ -7,7 +7,7 @@
 
 <div class="form-group">
     {{ Form::label('day', 'Datum') }}
-    {{ Form::date('day', null, ['class' => 'form-control']) }}
+    {{ Form::date('day', \Carbon\Carbon::now(), ['class' => 'form-control']) }}
 </div>
 
 <div class="form-group mt-5">

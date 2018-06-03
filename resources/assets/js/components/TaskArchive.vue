@@ -3,7 +3,7 @@
         <div v-for="(tasks, day) in groupedTasks">
             <strong>{{ showDay(day) }}</strong>
             <div v-for="task in tasks" class="card mb-1">
-                <task :item="task"></task>
+                <task :item="task" @deleted="remove($event)"></task>
             </div>
         </div>
     </div>
@@ -11,17 +11,18 @@
 
 <script>
 import Task from './Task';
+import tasks from '../mixins/tasks';
 
 export default {
-    props: ['tasks'],
-
-    data() {
-        return {
-            groupedTasks: this.tasks
-        };
-    },
+    props: ['archived'],
 
     components: { Task },
+
+    mixins: [ tasks ],
+
+    created() {
+        this.groupedTasks = this.archived;
+    },
 
     methods: {
 

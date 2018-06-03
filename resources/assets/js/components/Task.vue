@@ -1,5 +1,5 @@
 <template>
-    <div class="task d-flex align-items-center" :class="item.finished ? 'finished' : 'unfinished'">
+    <div class="task d-flex align-items-center" :class="taskClass(item)" >
         <div class="drag-area d-flex align-items-center pr-1" @click="toggleStatus(item)">
             <font-awesome-icon class="m-1 mr-3" :icon="iconOrder" v-if="!item.finished" />
             <font-awesome-icon class="mr-3" :icon="item.finished ? iconChecked : iconUnchecked" />
@@ -62,6 +62,30 @@ export default {
             });
 
         },
+
+        /**
+         * Deletes a task from database and the grouped task object
+         */
+        deleteTask(task) {
+            if (!confirm('Wirklich löschen?')) {
+                return;
+            }
+
+            axios.delete('/tasks/' + task.id)
+                .then(() => this.$emit('deleted', task));
+        },
+
+        taskClass(item) {
+            let classes = item.finished ? 'finished' : 'unfinished';
+
+            const parsedDate = moment(item.day, 'YYYY-MM-DD').startOf('day');
+
+            if (parsedDate < moment().startOf('day') && !item.finished) {
+                classes += ' bg-warning';
+            }
+
+            return classes;
+        }
 
     }
 }
