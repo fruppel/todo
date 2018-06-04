@@ -2,7 +2,7 @@
     <div id="task-list">
         <div v-for="(tasks, day) in groupedTasks">
             <strong>{{ showDay(day) }}</strong>
-            <draggable :list="tasks" :options="{group: 'undone', handle: '.drag-area'}" @change="updateOrder">
+            <draggable :list="tasks" :options="{group: 'undone', handle: '.drag-handle'}" @change="updateOrder">
                 <div v-for="task in tasks" class="card mb-1">
                     <task :item="task" @deleted="remove($event)"></task>
                 </div>

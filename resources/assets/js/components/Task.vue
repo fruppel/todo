@@ -1,7 +1,9 @@
 <template>
     <div class="task d-flex align-items-center" :class="taskClass(item)" >
-        <div class="drag-area d-flex align-items-center pr-1" @click="toggleStatus(item)">
-            <font-awesome-icon class="m-1 mr-3" :icon="iconOrder" v-if="!item.finished" />
+        <div class="d-flex align-items-center pr-1" @click="toggleStatus(item)">
+            <div class="drag-handle p-1 pr-3" v-if="!item.finished">
+                <font-awesome-icon :icon="iconOrder" />
+            </div>
             <font-awesome-icon class="mr-3" :icon="item.finished ? iconChecked : iconUnchecked" />
             <div class="description" :class="item.finished ? 'finished' : ''">
                 {{ item.description }}
