@@ -7,7 +7,7 @@
 
 <div class="form-group">
     {{ Form::label('day', 'Datum') }}
-    {{ Form::date('day', $edit->day ?? \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control']) }}
+    {{ Form::date('day', $task->day ?? \Carbon\Carbon::now()->format('Y-m-d'), ['class' => 'form-control']) }}
 </div>
 
 <div class="form-group mt-5">
