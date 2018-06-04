@@ -3,7 +3,7 @@
     "name": "ToDo",
     "icons": [
         {
-            "src": "/images/icons-256.png",
+            "src": "/images/icon-256.png",
             "type": "image/png",
             "sizes": "256x256"
         }
