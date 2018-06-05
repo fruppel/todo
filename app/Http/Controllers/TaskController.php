@@ -26,6 +26,7 @@ class TaskController extends Controller
             ->groupBy('day');
 
         $archived = Task::whereFinished(true)
+            ->whereUserId(auth()->id())
             ->orderBy('day', 'desc')
             ->orderBy('order', 'asc')
             ->get()
