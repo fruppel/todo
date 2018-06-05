@@ -5,6 +5,8 @@ use Illuminate\Database\Seeder;
 class TaskSeeder extends Seeder
 {
 
+    private const EMAIL = 'johndoe@example.com';
+
     /**
      * Runs the database seeds
      *
@@ -15,7 +17,16 @@ class TaskSeeder extends Seeder
     public function run()
     {
         $this->clear();
-        factory(App\Task::class, 30)->create();
+
+        $user = factory(App\User::class)->create([
+            'name' => 'John Doe',
+            'email' => self::EMAIL,
+            'password' => bcrypt('asdasd'),
+        ]);
+
+        factory(App\Task::class, 30)->create([
+            'user_id' => $user->id
+        ]);
     }
 
     /**

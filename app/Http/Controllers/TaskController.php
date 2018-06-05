@@ -19,6 +19,7 @@ class TaskController extends Controller
     public function index()
     {
         $todo = Task::whereFinished(false)
+            ->whereUserId(auth()->id())
             ->orderBy('day', 'asc')
             ->orderBy('order', 'asc')
             ->get()
@@ -56,7 +57,7 @@ class TaskController extends Controller
             'day' => 'required',
         ]);
 
-        Task::create(request()->all());
+        Task::create(request()->all() + ['user_id' => auth()->id()]);
 
         return redirect()->route('tasks.index');
     }
@@ -69,7 +70,6 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-
         return view('tasks.edit', compact('task'));
     }
 
@@ -102,7 +102,7 @@ class TaskController extends Controller
         // Make a flat array
         $orderedTasks = call_user_func_array('array_merge', request()->get('tasks'));
 
-        $tasks = Task::all();
+        $tasks = Task::whereUserId(auth()->id())->get();
 
         foreach ($tasks as $task) {
             $task->timestamps = false;
