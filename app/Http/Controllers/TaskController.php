@@ -60,7 +60,9 @@ class TaskController extends Controller
 
         Task::create(request()->all() + ['user_id' => auth()->id()]);
 
-        return redirect()->route('tasks.index');
+        return redirect()
+            ->route('tasks.index')
+            ->with('flash', 'Aufgabe erstellt');
     }
 
     /**
