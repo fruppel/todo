@@ -92,7 +92,7 @@ class TaskController extends Controller
         $task->update(request()->all());
 
         return redirect()->route('tasks.index')
-            ->with('success', 'Task updated');
+            ->with('flash', 'Aufgabe aktualisiert');
     }
 
     /**
