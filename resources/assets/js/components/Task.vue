@@ -63,6 +63,7 @@ export default {
                 finished: task.finished
             });
 
+            this.$emit('statusToggled', task);
         },
 
         /**
@@ -74,7 +75,10 @@ export default {
             }
 
             axios.delete('/tasks/' + task.id)
-                .then(() => this.$emit('deleted', task));
+                .then(() => {
+                    this.$emit('deleted', task);
+                    flash('Aufgabe gelöscht');
+                });
         },
 
         taskClass(item) {

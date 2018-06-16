@@ -1,9 +1,9 @@
 <template>
     <div>
-        <task-list :todo="todo"></task-list>
+        <task-list :todo="todo" ref="taskList" @removed="onRemoved($event)"></task-list>
         <hr>
         <h3>Archiv</h3>
-        <task-archive :archived="archived"></task-archive>
+        <task-archive :archived="archived" ref="taskArchive" @removed="onRemoved($event)"></task-archive>
     </div>
 </template>
 
@@ -15,7 +15,22 @@
         props: ['todo', 'archived'],
 
         components: {
-            TaskList, TaskArchive
+            'task-list': TaskList,
+            'task-archive': TaskArchive
+        },
+
+        methods: {
+
+            onRemoved(task) {
+                if (task.finished) {
+                    this.$refs.taskArchive.add(task);
+                    flash('Aufgabe erledigt');
+                    return;
+                }
+
+                this.$refs.taskList.add(task);
+                flash('Aufgabe wiederhergestellt');
+            }
         }
     }
 </script>

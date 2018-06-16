@@ -14,6 +14,8 @@ try {
     require('bootstrap');
 } catch (e) {}
 
+window.Vue = require('vue');
+
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
@@ -56,3 +58,10 @@ if (token) {
 
 window.moment = require('moment');
 window.moment.locale('de');
+
+// Global event bus
+window.events = new Vue();
+
+window.flash = function (message, level = 'success') {
+    window.events.$emit('flash',  { message, level });
+};

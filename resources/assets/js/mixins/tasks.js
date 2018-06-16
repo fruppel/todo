@@ -2,16 +2,30 @@ export default {
     data() {
         return {
             groupedTasks: {}
-        };
+        }
     },
 
     methods: {
+        add(task) {
+            if (typeof this.groupedTasks[task.day] === 'undefined') {
+                Vue.set(this.groupedTasks, task.day, [task]);
+                return;
+            }
+
+            this.groupedTasks[task.day].push(task);
+        },
+
         remove(task) {
             for (let index in this.groupedTasks[task.day]) {
                 if (this.groupedTasks[task.day][index].id === task.id) {
                     this.groupedTasks[task.day].splice(index, 1);
                 }
             }
+        },
+
+        move(task) {
+            this.remove(task);
+            this.$emit('removed', task);
         },
 
         /**

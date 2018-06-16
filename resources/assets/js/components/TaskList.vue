@@ -1,10 +1,10 @@
 <template>
     <div id="task-list">
         <div v-for="(tasks, day) in groupedTasks">
-            <strong>{{ showDay(day) }}</strong>
+            <strong>{{ showFormattedDay(day) }}</strong>
             <draggable :list="tasks" :options="{group: 'undone', handle: '.drag-handle'}" @change="updateOrder">
                 <div v-for="task in tasks" class="card mb-1">
-                    <task :item="task" @deleted="remove($event)"></task>
+                    <task :item="task" @statusToggled="move($event)" @deleted="remove($event)"></task>
                 </div>
             </draggable>
         </div>
@@ -31,12 +31,17 @@ export default {
 
     methods: {
 
+        /**
+         * Updates the order of all items
+         */
         updateOrder() {
             this.calculateIndices();
 
             axios.patch('/tasks/updateOrder', {
                 tasks: this.groupedTasks
-            })
+            }).then(() => {
+                flash('Aufgabe verschoben');
+            });
         },
 
         /**
@@ -44,7 +49,7 @@ export default {
          *
          * @param {String} day
          */
-        showDay(day) {
+        showFormattedDay(day) {
             return moment(day, 'YYYY-MM-DD').format('dddd, DD.MM.YYYY');
         },
 

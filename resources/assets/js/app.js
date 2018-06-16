@@ -1,7 +1,6 @@
 require('./bootstrap');
 
-window.Vue = require('vue');
-
+Vue.component('flash', require('./components/Flash'));
 Vue.component('tasks', require('./components/Tasks'));
 
 const app = new Vue({

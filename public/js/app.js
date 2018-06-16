@@ -30422,12 +30422,24 @@ module.exports = Component.exports
 
 
     methods: {
+        add: function add(task) {
+            if (typeof this.groupedTasks[task.day] === 'undefined') {
+                Vue.set(this.groupedTasks, task.day, [task]);
+                return;
+            }
+
+            this.groupedTasks[task.day].push(task);
+        },
         remove: function remove(task) {
             for (var index in this.groupedTasks[task.day]) {
                 if (this.groupedTasks[task.day][index].id === task.id) {
                     this.groupedTasks[task.day].splice(index, 1);
                 }
             }
+        },
+        move: function move(task) {
+            this.remove(task);
+            this.$emit('removed', task);
         },
 
 
@@ -30467,8 +30479,7 @@ module.exports = __webpack_require__(189);
 
 __webpack_require__(141);
 
-window.Vue = __webpack_require__(164);
-
+Vue.component('flash', __webpack_require__(193));
 Vue.component('tasks', __webpack_require__(167));
 
 var app = new Vue({
@@ -30494,6 +30505,8 @@ try {
 
   __webpack_require__(143);
 } catch (e) {}
+
+window.Vue = __webpack_require__(164);
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -30537,6 +30550,15 @@ if (token) {
 
 window.moment = __webpack_require__(0);
 window.moment.locale('de');
+
+// Global event bus
+window.events = new Vue();
+
+window.flash = function (message) {
+  var level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
+
+  window.events.$emit('flash', { message: message, level: level });
+};
 
 /***/ }),
 /* 142 */
@@ -64043,7 +64065,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     props: ['todo', 'archived'],
 
     components: {
-        TaskList: __WEBPACK_IMPORTED_MODULE_0__TaskList___default.a, TaskArchive: __WEBPACK_IMPORTED_MODULE_1__TaskArchive___default.a
+        'task-list': __WEBPACK_IMPORTED_MODULE_0__TaskList___default.a,
+        'task-archive': __WEBPACK_IMPORTED_MODULE_1__TaskArchive___default.a
+    },
+
+    methods: {
+        onRemoved: function onRemoved(task) {
+            if (task.finished) {
+                this.$refs.taskArchive.add(task);
+                flash('Aufgabe erledigt');
+                return;
+            }
+
+            this.$refs.taskList.add(task);
+            flash('Aufgabe wiederhergestellt');
+        }
     }
 });
 
@@ -64138,11 +64174,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
     methods: {
+
+        /**
+         * Updates the order of all items
+         */
         updateOrder: function updateOrder() {
             this.calculateIndices();
 
             axios.patch('/tasks/updateOrder', {
                 tasks: this.groupedTasks
+            }).then(function () {
+                flash('Aufgabe verschoben');
             });
         },
 
@@ -64152,7 +64194,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
          *
          * @param {String} day
          */
-        showDay: function showDay(day) {
+        showFormattedDay: function showFormattedDay(day) {
             return moment(day, 'YYYY-MM-DD').format('dddd, DD.MM.YYYY');
         }
     }
@@ -66573,6 +66615,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.patch('/tasks/updateFinished/' + task.id, {
                 finished: task.finished
             });
+
+            this.$emit('statusToggled', task);
         },
 
 
@@ -66587,7 +66631,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
 
             axios.delete('/tasks/' + task.id).then(function () {
-                return _this.$emit('deleted', task);
+                _this.$emit('deleted', task);
+                flash('Aufgabe gelöscht');
             });
         },
         taskClass: function taskClass(item) {
@@ -71733,7 +71778,7 @@ var render = function() {
       return _c(
         "div",
         [
-          _c("strong", [_vm._v(_vm._s(_vm.showDay(day)))]),
+          _c("strong", [_vm._v(_vm._s(_vm.showFormattedDay(day)))]),
           _vm._v(" "),
           _c(
             "draggable",
@@ -71752,6 +71797,9 @@ var render = function() {
                   _c("task", {
                     attrs: { item: task },
                     on: {
+                      statusToggled: function($event) {
+                        _vm.move($event)
+                      },
                       deleted: function($event) {
                         _vm.remove($event)
                       }
@@ -71899,6 +71947,9 @@ var render = function() {
                 _c("task", {
                   attrs: { item: task },
                   on: {
+                    statusToggled: function($event) {
+                      _vm.move($event)
+                    },
                     deleted: function($event) {
                       _vm.remove($event)
                     }
@@ -71935,13 +71986,29 @@ var render = function() {
   return _c(
     "div",
     [
-      _c("task-list", { attrs: { todo: _vm.todo } }),
+      _c("task-list", {
+        ref: "taskList",
+        attrs: { todo: _vm.todo },
+        on: {
+          removed: function($event) {
+            _vm.onRemoved($event)
+          }
+        }
+      }),
       _vm._v(" "),
       _c("hr"),
       _vm._v(" "),
       _c("h3", [_vm._v("Archiv")]),
       _vm._v(" "),
-      _c("task-archive", { attrs: { archived: _vm.archived } })
+      _c("task-archive", {
+        ref: "taskArchive",
+        attrs: { archived: _vm.archived },
+        on: {
+          removed: function($event) {
+            _vm.onRemoved($event)
+          }
+        }
+      })
     ],
     1
   )
@@ -71961,6 +72028,191 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(198)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(196)
+/* template */
+var __vue_template__ = __webpack_require__(200)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-24005b09"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Flash.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-24005b09", Component.options)
+  } else {
+    hotAPI.reload("data-v-24005b09", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 194 */,
+/* 195 */,
+/* 196 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['message'],
+
+    data: function data() {
+        return {
+            body: this.message,
+            level: 'success',
+            show: false
+        };
+    },
+
+
+    computed: {},
+
+    created: function created() {
+        var _this = this;
+
+        if (this.message) {
+            this.flash();
+        }
+
+        window.events.$on('flash', function (data) {
+            _this.flash(data);
+        });
+    },
+
+
+    methods: {
+        flash: function flash(data) {
+            if (data) {
+                this.body = data.message;
+                this.level = data.level;
+            }
+
+            this.show = true;
+
+            this.hide();
+        },
+        hide: function hide() {
+            var _this2 = this;
+
+            window.setTimeout(function () {
+                _this2.show = false;
+            }, 3000);
+        }
+    }
+});
+
+/***/ }),
+/* 197 */,
+/* 198 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(199);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(176)("4f30c49e", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24005b09\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Flash.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-24005b09\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Flash.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 199 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(175)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.alert-flash[data-v-24005b09] {\n    position: fixed;\n    right: 25px;\n    bottom: 25px;\n}\n.visible[data-v-24005b09] {\n    visibility: visible;\n    opacity: 1;\n    -webkit-transition: opacity .1s linear;\n    transition: opacity .1s linear;\n}\n.hidden[data-v-24005b09] {\n    visibility: hidden;\n    opacity: 0;\n    -webkit-transition: visibility 0s .5s, opacity .5s linear;\n    transition: visibility 0s .5s, opacity .5s linear;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 200 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", {
+    staticClass: "alert alert-flash",
+    class: [_vm.show ? "visible" : "hidden", "alert-" + _vm.level],
+    attrs: { role: "alert" },
+    domProps: { textContent: _vm._s(_vm.body) }
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-24005b09", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);
