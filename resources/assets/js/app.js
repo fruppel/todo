@@ -1,8 +1,8 @@
 require('./bootstrap');
 
-Vue.component('flash', require('./components/Flash'));
-Vue.component('tasks', require('./components/Tasks'));
+Vue.component('flash', require('./components/Flash').default);
+Vue.component('tasks', require('./components/Tasks').default);
 
-const app = new Vue({
+new Vue({
     el: '#app'
 });
