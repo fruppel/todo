@@ -7,7 +7,7 @@
 
 <div class="form-group">
     <label for="day">Datum</label>
-    <input type="date" id="day" name="day" :value.prop="'{{ old('day', $task->day ?? \Carbon\Carbon::now()->format('Y-m-d')) }}'" class="form-control">
+    <input type="date" id="day" name="day" :value.prop="'{{ old('day', $task->day ?? \Carbon\Carbon::tomorrow()->format('Y-m-d')) }}'" class="form-control">
 </div>
 
 <div class="form-group mt-5">
