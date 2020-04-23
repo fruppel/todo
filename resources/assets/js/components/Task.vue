@@ -2,35 +2,28 @@
     <div class="task d-flex align-items-center" :class="taskClass(item)" >
         <div class="d-flex align-items-center pr-1" @click="toggleStatus(item)">
             <div class="drag-handle p-1 pr-3" v-if="!item.finished">
-                <font-awesome-icon :icon="iconOrder" />
+                <span class="material-icons md-18">more_vert</span>
             </div>
-            <font-awesome-icon class="mr-3" :icon="item.finished ? iconChecked : iconUnchecked" />
+            <span class="material-icons mr-3 md-18">{{ item.finished ? 'check_box' : 'check_box_outline_blank' }}</span>
             <div class="description" :class="item.finished ? 'finished' : ''">
                 {{ item.description }}
             </div>
         </div>
         <div class="buttons ml-auto text-nowrap">
             <a class="btn btn-sm btn-outline-info" :href="'/tasks/' + item.id + '/edit/'">
-                <font-awesome-icon :icon="iconEdit" />
+                <span class="material-icons md-18">edit</span>
             </a>
             <button class="btn btn-sm btn-outline-danger" @click="deleteTask(item)">
-                <font-awesome-icon :icon="iconTrash" />
+                <span class="material-icons md-18">delete</span>
             </button>
         </div>
     </div>
 </template>
 
 <script>
-import FontAwesomeIcon from '@fortawesome/vue-fontawesome';
-import { faEllipsisV, faEdit, faTrash } from '@fortawesome/fontawesome-free-solid';
-import { faSquare, faCheckSquare } from '@fortawesome/fontawesome-free-regular';
 
 export default {
     props: ['item'],
-
-    components: {
-        FontAwesomeIcon
-    },
 
     computed: {
         iconEdit() {
