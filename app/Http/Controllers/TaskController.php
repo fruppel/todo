@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Task;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class TaskController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+//    public function __construct()
+//    {
+//        $this->middleware('auth');
+//    }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(): Response
     {
         $todo = Task::whereFinished(false)
             ->whereUserId(auth()->id())
@@ -32,48 +33,45 @@ class TaskController extends Controller
             ->get()
             ->groupBy('day');;
 
-
-        return view('tasks.index', compact('todo', 'archived'));
+        return Inertia::render('Tasks/Index', [
+            'todo' => $todo,
+            'archived' => $archived,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function create(): Response
     {
-        return view('tasks.create');
+        return Inertia::render('Tasks/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function store()
+    public function edit(Task $task): Response
     {
-        request()->validate([
+        return Inertia::render('Tasks/Edit', compact('task'));
+    }
+
+    public function store(Request $request)
+    {
+        Validator::make($request->all(), [
             'description' => 'required',
             'day' => 'required',
-        ]);
+        ])->validateWithBag('storeTask');
+
+//        request()->validate([
+//            'description' => 'required',
+//            'day' => 'required',
+//        ]);
 
         Task::create(request()->all() + ['user_id' => auth()->id()]);
 
-        return redirect()
-            ->route('tasks.index')
-            ->with('flash', 'Aufgabe erstellt');
-    }
+        return Redirect::route('tasks.index');
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Task  $task
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Task $task)
-    {
-        return view('tasks.edit', compact('task'));
+        return $request->wantsJson()
+            ? new JsonResponse('', 200)
+            : back()->with('flash', 'Aufgabe erstellt');
+
+//        return redirect()
+//            ->route('tasks.index')
+//            ->with('flash', 'Aufgabe erstellt');
     }
 
     /**

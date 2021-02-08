@@ -1,11 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 Route::get('/', function () {
     return redirect()->route('tasks.index');
 });
 
-Auth::routes();
-
-Route::patch('tasks/updateOrder', 'TaskController@updateOrder');
-Route::patch('tasks/updateFinished/{task}', 'TaskController@updateFinished');
-Route::resource('tasks', 'TaskController');
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::resource('tasks', \App\Http\Controllers\TaskController::class);
+    Route::patch('tasks/updateOrder', [\App\Http\Controllers\TaskController::class, 'updateOrder']);
+    Route::patch('tasks/updateFinished/{task}', [\App\Http\Controllers\TaskController::class, 'updateFinished']);
+});
