@@ -12,11 +12,6 @@ use Inertia\Response;
 
 class TaskController extends Controller
 {
-//    public function __construct()
-//    {
-//        $this->middleware('auth');
-//    }
-
     public function index(): Response
     {
         $todo = Task::whereFinished(false)
@@ -56,11 +51,6 @@ class TaskController extends Controller
             'day' => 'required',
         ])->validateWithBag('storeTask');
 
-//        request()->validate([
-//            'description' => 'required',
-//            'day' => 'required',
-//        ]);
-
         Task::create(request()->all() + ['user_id' => auth()->id()]);
 
         return Redirect::route('tasks.index');
@@ -68,18 +58,8 @@ class TaskController extends Controller
         return $request->wantsJson()
             ? new JsonResponse('', 200)
             : back()->with('flash', 'Aufgabe erstellt');
-
-//        return redirect()
-//            ->route('tasks.index')
-//            ->with('flash', 'Aufgabe erstellt');
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Task  $task
-     * @return \Illuminate\Http\Response
-     */
     public function update(Task $task)
     {
         request()->validate([
@@ -93,11 +73,6 @@ class TaskController extends Controller
             ->with('flash', 'Aufgabe aktualisiert');
     }
 
-    /**
-     * Updates the ordering of all tasks
-     *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
-     */
     public function updateOrder()
     {
         // Make a flat array
@@ -129,12 +104,6 @@ class TaskController extends Controller
         return response('Update successful', 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Task  $task
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Task $task)
     {
         $task->delete();
