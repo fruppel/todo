@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 
 class TaskSeeder extends Seeder
 {
-
     private const EMAIL = 'johndoe@example.com';
 
     /**
@@ -18,13 +17,13 @@ class TaskSeeder extends Seeder
     {
         $this->clear();
 
-        $user = factory(App\User::class)->create([
+        $user = factory(\App\Models\User::class)->create([
             'name' => 'John Doe',
             'email' => self::EMAIL,
             'password' => bcrypt('asdasd'),
         ]);
 
-        factory(App\Task::class, 30)->create([
+        factory(\App\Models\Task::class, 30)->create([
             'user_id' => $user->id
         ]);
     }
@@ -38,6 +37,6 @@ class TaskSeeder extends Seeder
      */
     private function clear()
     {
-        \App\Task::query()->delete();
+        App\Models\Task::query()->delete();
     }
 }

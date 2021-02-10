@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Task;
+use App\Models\Task;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +19,7 @@ class TaskTest extends TestCase
             'day' => Carbon::now()->format('Y-m-d')
         ];
 
-        $task = Task::create($data);
+        $task = Task::factory($data)->create();
 
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($data['description'], $task->description);
