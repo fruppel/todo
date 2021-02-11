@@ -1,8 +1,9 @@
 <template>
     <div id="task-list">
+        <span v-if="showNoTodos" class="text-gray-500">Keine Todos</span>
         <div v-for="(tasks, day) in groupedTasks">
             <strong>{{ showFormattedDay(day) }}</strong>
-            <draggable :list="tasks" :options="{group: 'undone', handle: '.drag-handle'}" @change="updateOrder">
+            <draggable :list="tasks" v-bind="getOptions()" @change="updateOrder">
                 <div v-for="task in tasks" class="mb-1">
                     <task :item="task" @statusToggled="move($event)" @deleted="remove($event)"></task>
                 </div>
@@ -25,30 +26,36 @@ export default {
         Task, draggable
     },
 
-    created() {
-        this.groupedTasks = this.todo;
+    data() {
+        return {
+            groupedTasks: this.todo
+        }
+    },
+
+    computed: {
+        showNoTodos() {
+            return this.groupedTasks.length === 0;
+        }
     },
 
     methods: {
+        getOptions() {
+            return {
+                group: 'undone',
+                handle: '.drag-handle'
+            };
+        },
 
-        /**
-         * Updates the order of all items
-         */
         updateOrder() {
             this.calculateIndices();
 
-            axios.patch('/tasks/updateOrder', {
+            axios.patch(route('taskorder.update'), {
                 tasks: this.groupedTasks
-            }).then(() => {
-                flash('Aufgabe verschoben');
-            });
+            })
+            .then(() => flash('Todo verschoben'))
+            .catch(error => console.error(error))
         },
 
-        /**
-         * Parses the day and produces a better readable output
-         *
-         * @param {String} day
-         */
         showFormattedDay(day) {
             return moment(day, 'YYYY-MM-DD').format('dddd, DD.MM.YYYY');
         },

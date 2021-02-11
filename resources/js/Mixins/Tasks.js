@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 export default {
     data() {
         return {
@@ -8,7 +10,11 @@ export default {
     methods: {
         add(task) {
             if (typeof this.groupedTasks[task.day] === 'undefined') {
-                Vue.set(this.groupedTasks, task.day, [task]);
+                const newTask = {};
+                newTask[task.day] = [task];
+
+                this.groupedTasks = Object.assign({}, this.groupedTasks, newTask);
+
                 return;
             }
 
@@ -20,6 +26,10 @@ export default {
                 if (this.groupedTasks[task.day][index].id === task.id) {
                     this.groupedTasks[task.day].splice(index, 1);
                 }
+            }
+
+            if (this.groupedTasks[task.day].length === 0) {
+                delete this.groupedTasks[task.day];
             }
         },
 

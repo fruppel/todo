@@ -2029,6 +2029,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -2037,15 +2038,17 @@ __webpack_require__.r(__webpack_exports__);
     Task: _Task__WEBPACK_IMPORTED_MODULE_0__.default
   },
   mixins: [_Mixins_Tasks__WEBPACK_IMPORTED_MODULE_1__.default],
-  created: function created() {
-    this.groupedTasks = this.archived;
+  data: function data() {
+    return {
+      groupedTasks: this.archived
+    };
+  },
+  computed: {
+    showNoTodos: function showNoTodos() {
+      return this.groupedTasks.length === 0;
+    }
   },
   methods: {
-    /**
-     * Parses the day and produces a better readable output
-     *
-     * @param {String} day
-     */
     showDay: function showDay(day) {
       return moment(day, 'YYYY-MM-DD').format('DD.MM.YYYY');
     }
@@ -2082,6 +2085,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -2092,27 +2096,33 @@ __webpack_require__.r(__webpack_exports__);
     Task: _Task__WEBPACK_IMPORTED_MODULE_1__.default,
     draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default())
   },
-  created: function created() {
-    this.groupedTasks = this.todo;
+  data: function data() {
+    return {
+      groupedTasks: this.todo
+    };
+  },
+  computed: {
+    showNoTodos: function showNoTodos() {
+      return this.groupedTasks.length === 0;
+    }
   },
   methods: {
-    /**
-     * Updates the order of all items
-     */
+    getOptions: function getOptions() {
+      return {
+        group: 'undone',
+        handle: '.drag-handle'
+      };
+    },
     updateOrder: function updateOrder() {
       this.calculateIndices();
-      axios.patch('/tasks/updateOrder', {
+      axios.patch(route('taskorder.update'), {
         tasks: this.groupedTasks
       }).then(function () {
-        flash('Aufgabe verschoben');
+        return flash('Todo verschoben');
+      })["catch"](function (error) {
+        return console.error(error);
       });
     },
-
-    /**
-     * Parses the day and produces a better readable output
-     *
-     * @param {String} day
-     */
     showFormattedDay: function showFormattedDay(day) {
       return moment(day, 'YYYY-MM-DD').format('dddd, DD.MM.YYYY');
     }
@@ -5321,6 +5331,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -5330,7 +5341,9 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     add: function add(task) {
       if (typeof this.groupedTasks[task.day] === 'undefined') {
-        Vue.set(this.groupedTasks, task.day, [task]);
+        var newTask = {};
+        newTask[task.day] = [task];
+        this.groupedTasks = Object.assign({}, this.groupedTasks, newTask);
         return;
       }
 
@@ -5341,6 +5354,10 @@ __webpack_require__.r(__webpack_exports__);
         if (this.groupedTasks[task.day][index].id === task.id) {
           this.groupedTasks[task.day].splice(index, 1);
         }
+      }
+
+      if (this.groupedTasks[task.day].length === 0) {
+        delete this.groupedTasks[task.day];
       }
     },
     move: function move(task) {
@@ -5510,15 +5527,15 @@ module.exports = function (cssWithMappingToString) {
       }
 
       return content;
-    }).join('');
+    }).join("");
   }; // import a list of modules into the list
   // eslint-disable-next-line func-names
 
 
   list.i = function (modules, mediaQuery, dedupe) {
-    if (typeof modules === 'string') {
+    if (typeof modules === "string") {
       // eslint-disable-next-line no-param-reassign
-      modules = [[null, modules, '']];
+      modules = [[null, modules, ""]];
     }
 
     var alreadyImportedModules = {};
@@ -53768,37 +53785,43 @@ var render = function() {
   return _c(
     "div",
     { attrs: { id: "task-archive" } },
-    _vm._l(_vm.groupedTasks, function(tasks, day) {
-      return _c(
-        "div",
-        [
-          _c("strong", [_vm._v(_vm._s(_vm.showDay(day)))]),
-          _vm._v(" "),
-          _vm._l(tasks, function(task) {
-            return _c(
-              "div",
-              { staticClass: "card mb-1" },
-              [
-                _c("task", {
-                  attrs: { item: task },
-                  on: {
-                    statusToggled: function($event) {
-                      return _vm.move($event)
-                    },
-                    deleted: function($event) {
-                      return _vm.remove($event)
+    [
+      _vm.showNoTodos
+        ? _c("span", { staticClass: "text-gray-500" }, [_vm._v("Keine Todos")])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm._l(_vm.groupedTasks, function(tasks, day) {
+        return _c(
+          "div",
+          [
+            _c("strong", [_vm._v(_vm._s(_vm.showDay(day)))]),
+            _vm._v(" "),
+            _vm._l(tasks, function(task) {
+              return _c(
+                "div",
+                { staticClass: "card mb-1" },
+                [
+                  _c("task", {
+                    attrs: { item: task },
+                    on: {
+                      statusToggled: function($event) {
+                        return _vm.move($event)
+                      },
+                      deleted: function($event) {
+                        return _vm.remove($event)
+                      }
                     }
-                  }
-                })
-              ],
-              1
-            )
-          })
-        ],
-        2
-      )
-    }),
-    0
+                  })
+                ],
+                1
+              )
+            })
+          ],
+          2
+        )
+      })
+    ],
+    2
   )
 }
 var staticRenderFns = []
@@ -53827,48 +53850,53 @@ var render = function() {
   return _c(
     "div",
     { attrs: { id: "task-list" } },
-    _vm._l(_vm.groupedTasks, function(tasks, day) {
-      return _c(
-        "div",
-        [
-          _c("strong", [_vm._v(_vm._s(_vm.showFormattedDay(day)))]),
-          _vm._v(" "),
-          _c(
-            "draggable",
-            {
-              attrs: {
-                list: tasks,
-                options: { group: "undone", handle: ".drag-handle" }
-              },
-              on: { change: _vm.updateOrder }
-            },
-            _vm._l(tasks, function(task) {
-              return _c(
-                "div",
-                { staticClass: "mb-1" },
-                [
-                  _c("task", {
-                    attrs: { item: task },
-                    on: {
-                      statusToggled: function($event) {
-                        return _vm.move($event)
-                      },
-                      deleted: function($event) {
-                        return _vm.remove($event)
+    [
+      _vm.showNoTodos
+        ? _c("span", { staticClass: "text-gray-500" }, [_vm._v("Keine Todos")])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm._l(_vm.groupedTasks, function(tasks, day) {
+        return _c(
+          "div",
+          [
+            _c("strong", [_vm._v(_vm._s(_vm.showFormattedDay(day)))]),
+            _vm._v(" "),
+            _c(
+              "draggable",
+              _vm._b(
+                { attrs: { list: tasks }, on: { change: _vm.updateOrder } },
+                "draggable",
+                _vm.getOptions(),
+                false
+              ),
+              _vm._l(tasks, function(task) {
+                return _c(
+                  "div",
+                  { staticClass: "mb-1" },
+                  [
+                    _c("task", {
+                      attrs: { item: task },
+                      on: {
+                        statusToggled: function($event) {
+                          return _vm.move($event)
+                        },
+                        deleted: function($event) {
+                          return _vm.remove($event)
+                        }
                       }
-                    }
-                  })
-                ],
-                1
-              )
-            }),
-            0
-          )
-        ],
-        1
-      )
-    }),
-    0
+                    })
+                  ],
+                  1
+                )
+              }),
+              0
+            )
+          ],
+          1
+        )
+      })
+    ],
+    2
   )
 }
 var staticRenderFns = []

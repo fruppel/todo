@@ -73,29 +73,6 @@ class TaskController extends Controller
             ->with('flash', 'Aufgabe aktualisiert');
     }
 
-    public function updateOrder()
-    {
-        // Make a flat array
-        $orderedTasks = call_user_func_array('array_merge', request()->get('tasks'));
-
-        $tasks = Task::whereUserId(auth()->id())->get();
-
-        foreach ($tasks as $task) {
-            $task->timestamps = false;
-
-            foreach ($orderedTasks as $orderedTask) {
-                if ($orderedTask['id'] === $task->id) {
-                    $task->update([
-                        'order' => $orderedTask['order'],
-                        'day' => $orderedTask['day'],
-                    ]);
-                }
-            }
-        }
-
-        return response('Update successful', 200);
-    }
-
     public function updateFinished(Task $task)
     {
         $task->finished = request()->get('finished');
