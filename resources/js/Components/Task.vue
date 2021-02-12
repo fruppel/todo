@@ -41,9 +41,11 @@ export default {
 
             axios.patch('/tasks/updateFinished/' + task.id, {
                 finished: task.finished
+            }).then(() => {
+                this.$emit('statusToggled', task);
+            }).catch(error => {
+                flash(error + ' ' + error.response.data.message, 'error');
             });
-
-            this.$emit('statusToggled', task);
         },
 
         deleteTask(task) {
@@ -54,7 +56,7 @@ export default {
             axios.delete('/tasks/' + task.id)
                 .then(() => {
                     this.$emit('deleted', task);
-                    flash('Aufgabe gelöscht');
+                    flash('Todo gelöscht');
                 });
         },
 

@@ -70,15 +70,18 @@ class TaskController extends Controller
         $task->update(request()->all());
 
         return redirect()->route('tasks.index')
-            ->with('flash', 'Aufgabe aktualisiert');
+            ->with('flash', 'Todo aktualisiert');
     }
 
     public function updateFinished(Task $task)
     {
         $task->finished = request()->get('finished');
-        $task->save();
 
-        return response('Update successful', 200);
+        if ($task->save() === true) {
+            return response('Update successful', 200);
+        }
+
+        throw new \Exception('Task could not be saved');
     }
 
     public function destroy(Task $task)
