@@ -1,6 +1,6 @@
 <template>
-    <div class="alert fixed right-5 bottom-4 bg-green-300 p-3"
-         :class="[show ? 'visible' : 'hidden']"
+    <div class="alert fixed right-5 bottom-4 p-3"
+         :class="classes"
          role="alert"
          v-text="body">
     </div>
@@ -15,6 +15,15 @@ export default {
             body: this.message,
             level: 'success',
             show: false
+        }
+    },
+
+    computed: {
+        classes() {
+            return [
+                this.show ? 'visible' : 'hidden',
+                this.level === 'success' ? 'bg-green-300' : 'bg-red-300'
+            ];
         }
     },
 
@@ -44,21 +53,7 @@ export default {
             window.setTimeout(() => {
                 this.show = false;
             }, 3000);
-        }
+        },
     }
 }
 </script>
-
-<style scoped>
-    .visible {
-        visibility: visible;
-        opacity: 1;
-        transition: opacity .1s linear;
-    }
-
-    .hidden {
-        visibility: hidden;
-        opacity: 0;
-        transition: visibility 0s .5s, opacity .5s linear;
-    }
-</style>
