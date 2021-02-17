@@ -80,7 +80,6 @@ export default {
         },
 
         abort() {
-            console.log('anort');
             this.$inertia.get(route('tasks.index'));
         },
 
