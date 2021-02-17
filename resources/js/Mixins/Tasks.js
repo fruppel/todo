@@ -8,12 +8,22 @@ export default {
     },
 
     methods: {
+
         add(task) {
             if (typeof this.groupedTasks[task.day] === 'undefined') {
                 const newTask = {};
                 newTask[task.day] = [task];
 
                 this.groupedTasks = Object.assign({}, this.groupedTasks, newTask);
+
+                // Resort
+                let sortedObjects = Object.entries(this.groupedTasks).sort();
+
+                if (task.finished === true) {
+                    sortedObjects = sortedObjects.reverse();
+                }
+
+                this.groupedTasks = Object.fromEntries(sortedObjects);
 
                 return;
             }

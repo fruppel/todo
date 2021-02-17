@@ -30,12 +30,12 @@ export default {
         onRemoved(task) {
             if (task.finished) {
                 this.$refs.taskArchive.add(task);
-                flash('Aufgabe erledigt');
+                flash('Todo erledigt');
                 return;
             }
 
             this.$refs.taskList.add(task);
-            flash('Aufgabe wiederhergestellt');
+            flash('Todo wiederhergestellt');
         }
     }
 }
