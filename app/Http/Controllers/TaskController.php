@@ -26,7 +26,7 @@ class TaskController extends Controller
             ->orderBy('day', 'desc')
             ->orderBy('order', 'asc')
             ->get()
-            ->groupBy('day');;
+            ->groupBy('day');
 
         return Inertia::render('Tasks/Index', [
             'todo' => $todo,

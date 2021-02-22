@@ -35,7 +35,6 @@ export default {
     props: ['item'],
 
     methods: {
-
         toggleStatus(task) {
             task.finished = !task.finished;
 

@@ -26,7 +26,6 @@ export default {
     props: ['todo', 'archived'],
 
     methods: {
-
         onRemoved(task) {
             if (task.finished) {
                 this.$refs.taskArchive.add(task);

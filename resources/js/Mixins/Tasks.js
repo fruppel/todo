@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export default {
     data() {
         return {
@@ -8,7 +6,6 @@ export default {
     },
 
     methods: {
-
         add(task) {
             if (typeof this.groupedTasks[task.day] === 'undefined') {
                 const newTask = {};
@@ -67,7 +64,6 @@ export default {
                 }
 
             }
-
-        },
+        }
     }
 }
