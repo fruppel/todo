@@ -21,16 +21,8 @@ class TaskController extends Controller
             ->get()
             ->groupBy('day');
 
-        $archived = Task::whereFinished(true)
-            ->whereUserId(auth()->id())
-            ->orderBy('day', 'desc')
-            ->orderBy('order', 'asc')
-            ->get()
-            ->groupBy('day');
-
         return Inertia::render('Tasks/Index', [
             'todo' => $todo,
-            'archived' => $archived,
         ]);
     }
 
@@ -54,31 +46,27 @@ class TaskController extends Controller
         Task::create(request()->all() + ['user_id' => auth()->id()]);
 
         return Redirect::route('tasks.index');
-
-        return $request->wantsJson()
-            ? new JsonResponse('', 200)
-            : back()->with('flash', 'Aufgabe erstellt');
     }
 
-    public function update(Task $task)
+    public function update(Task $task, Request $request)
     {
-        request()->validate([
+        $validatedRequest = $request->validate([
             'description' => 'required',
             'day' => 'required',
         ]);
 
-        $task->update(request()->all());
+        $task->update($validatedRequest);
 
         return redirect()->route('tasks.index')
             ->with('flash', 'Todo aktualisiert');
     }
 
-    public function updateFinished(Task $task)
+    public function updateFinished(Task $task, Request $request)
     {
-        $task->finished = request()->get('finished');
+        $task->finished = $request->get('finished');
 
         if ($task->save() === true) {
-            return response('Update successful', 200);
+            return response('Update successful');
         }
 
         throw new \Exception('Task could not be saved');
@@ -87,6 +75,6 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
-        return response('Task deleted', 200);
+        return response('Task deleted');
     }
 }

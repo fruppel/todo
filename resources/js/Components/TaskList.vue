@@ -1,14 +1,22 @@
 <template>
     <div id="task-list">
-        <span v-if="showNoTodos" class="text-gray-500">Keine Todos</span>
-        <div v-for="(tasks, day) in groupedTasks">
-            <strong>{{ showFormattedDay(day) }}</strong>
-            <draggable :list="tasks" v-bind="getOptions()" @change="updateOrder">
-                <div v-for="task in tasks" class="mb-1">
-                    <task :item="task" @statusToggled="move($event)" @deleted="remove($event)"></task>
-                </div>
-            </draggable>
-        </div>
+        <span v-show="showNoTodos" class="text-gray-500">Super, alles erledigt!</span>
+        <transition-group name="fade" tag="div">
+            <div v-for="(tasks, day) in groupedTasks" :key="day" v-show="showDay(tasks)">
+                <strong>{{ showFormattedDay(day) }}</strong>
+                <draggable :list="tasks" v-bind="getOptions()" @change="updateOrder">
+                    <transition-group name="bounce" tag="div">
+                        <task v-for="task in tasks"
+                              :item="task"
+                              :key="task.id"
+                              class="mb-1"
+                              @deleted="remove($event)"
+                              @checked="archive(task)">
+                        </task>
+                    </transition-group>
+                </draggable>
+            </div>
+        </transition-group>
     </div>
 </template>
 
@@ -34,8 +42,8 @@ export default {
 
     computed: {
         showNoTodos() {
-            return this.groupedTasks.length === 0;
-        }
+            return Object.entries(this.groupedTasks).length === 0;
+        },
     },
 
     methods: {
@@ -60,6 +68,44 @@ export default {
             return moment(day, 'YYYY-MM-DD').format('dddd, DD.MM.YYYY');
         },
 
+        archive(task) {
+            this.remove(task);
+        },
+
+
+        showDay(tasks) {
+            return tasks.length > 0;
+        }
+
     },
 }
 </script>
+
+<style>
+.bounce-enter-active {
+    animation: bounce-in .6s;
+}
+.bounce-leave-active {
+    animation: bounce-in .6s reverse;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .6s;
+}
+
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+@keyframes bounce-in {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+</style>

@@ -30,19 +30,17 @@ export default {
 
         remove(task) {
             for (let index in this.groupedTasks[task.day]) {
+                if (this.groupedTasks[task.day].hasOwnProperty(index) === false) {
+                    return;
+                }
+
                 if (this.groupedTasks[task.day][index].id === task.id) {
                     this.groupedTasks[task.day].splice(index, 1);
                 }
             }
-
             if (this.groupedTasks[task.day].length === 0) {
                 delete this.groupedTasks[task.day];
             }
-        },
-
-        move(task) {
-            this.remove(task);
-            this.$emit('removed', task);
         },
 
         /**

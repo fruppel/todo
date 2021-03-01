@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use Illuminate\Http\Request;
 
 class TaskOrderController extends Controller
 {
-    public function update()
+    public function update(Request $request)
     {
-        $orderedTasks = call_user_func_array('array_merge', request()->get('tasks'));
-        $tasks = Task::whereUserId(auth()->id())->get();
+        $orderedTasks = array_merge(...array_values($request->get('tasks')));
+        $tasks = Task::all()->where('user_id', '=', auth()->id());
 
         foreach ($tasks as $task) {
             $task->timestamps = false;
@@ -24,6 +25,6 @@ class TaskOrderController extends Controller
             }
         }
 
-        return response('Update successful', 200);
+        return response('Update successful');
     }
 }

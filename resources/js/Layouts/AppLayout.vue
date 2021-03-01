@@ -48,6 +48,9 @@
                                     </template>
 
                                     <template #content>
+                                        <jet-dropdown-link :href="route('tasks.archive')">
+                                            Archiv
+                                        </jet-dropdown-link>
                                         <jet-dropdown-link :href="route('profile.show')">
                                             Einstellungen
                                         </jet-dropdown-link>
@@ -96,7 +99,9 @@
                             <jet-responsive-nav-link :href="route('tasks.index')" :active="route().current('tasks.index')">
                                 Todos
                             </jet-responsive-nav-link>
-
+                            <jet-responsive-nav-link :href="route('tasks.archive')" :active="route().current('tasks.archive')">
+                                Archiv
+                            </jet-responsive-nav-link>
                             <jet-responsive-nav-link :href="route('profile.show')" :active="route().current('profile.show')">
                                 Einstellungen
                             </jet-responsive-nav-link>

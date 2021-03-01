@@ -1,7 +1,7 @@
 <template>
     <div class="task flex items-center border border-gray-200 rounded" :class="taskClass(item)" >
         <div class="flex items-center pr-1" @click="toggleStatus(item)">
-            <div class="drag-handle p-1 pr-3" v-if="!item.finished">
+            <div class="drag-handle p-1 pr-3">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-6 w-6">
                     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                 </svg>
@@ -41,7 +41,11 @@ export default {
             axios.patch('/tasks/updateFinished/' + task.id, {
                 finished: task.finished
             }).then(() => {
-                this.$emit('statusToggled', task);
+                if (task.finished) {
+                    this.$emit('checked', task);
+                } else {
+                    this.$emit('statusToggled', task);
+                }
             }).catch(error => {
                 flash(error + ' ' + error.response.data.message, 'error');
             });
