@@ -1,10 +1,6 @@
 <template>
     <div>
         <jet-form-section @submitted="submit">
-            <template #title>
-                {{ task ? 'Todo bearbeiten' : 'Todo erstellen' }}
-            </template>
-
             <template #form>
                 <div class="col-span-6 sm:col-span-4">
                     <jet-label for="description" value="Beschreibung" />

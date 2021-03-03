@@ -1,11 +1,14 @@
 <template>
+
     <div id="task-list">
-        <span v-show="showNoTodos" class="text-gray-500">Super, alles erledigt!</span>
+        <transition name="fadein">
+            <div v-if="showNoTodos" class="text-gray-500 text-center">Super, alles erledigt!</div>
+        </transition>
         <transition-group name="fade" tag="div">
-            <div v-for="(tasks, day) in groupedTasks" :key="day" v-show="showDay(tasks)">
+            <div v-for="(tasks, day) in groupedTasks" :key="groupKey(day)" v-show="showDay(tasks)" class="mb-3">
                 <strong>{{ showFormattedDay(day) }}</strong>
                 <draggable :list="tasks" v-bind="getOptions()" @change="updateOrder">
-                    <transition-group name="bounce" tag="div">
+                    <transition-group name="bounce" tag="div" @after-leave="afterLeave(day)">
                         <task v-for="task in tasks"
                               :item="task"
                               :key="task.id"
@@ -42,6 +45,7 @@ export default {
 
     computed: {
         showNoTodos() {
+            console.log('called showNoTodos');
             return Object.entries(this.groupedTasks).length === 0;
         },
     },
@@ -72,9 +76,19 @@ export default {
             this.remove(task);
         },
 
-
         showDay(tasks) {
             return tasks.length > 0;
+        },
+
+        afterLeave(day) {
+            if (this.groupedTasks[day].length === 0) {
+                delete this.groupedTasks[day];
+                this.groupedTasks = Object.assign({}, this.groupedTasks);
+            }
+        },
+
+        groupKey(day) {
+            return day;
         }
 
     },
@@ -95,6 +109,14 @@ export default {
 
 .fade-enter, .fade-leave-to {
     opacity: 0;
+}
+
+.fadein-enter-active, .fadein-leave-active {
+    transition: opacity .6s;
+}
+
+.fadein-enter, .fadein-leave-to {
+    opacity: 1;
 }
 
 @keyframes bounce-in {

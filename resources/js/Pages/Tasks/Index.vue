@@ -1,6 +1,9 @@
 <template>
     <app-layout>
-        <div class="max-w-7xl mx-auto py-10 px-2 lg:px-8">
+        <template #header class="header">
+            <h2 class="header">Offene Aufgaben</h2>
+        </template>
+        <div class="content">
             <task-list :todo="todo" ref="taskList"></task-list>
         </div>
     </app-layout>

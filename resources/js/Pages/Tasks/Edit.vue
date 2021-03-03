@@ -1,6 +1,9 @@
 <template>
     <app-layout>
-        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+        <template #header>
+            <h2 class="header">Aufgabe bearbeiten</h2>
+        </template>
+        <div class="content">
             <task-form :task="task"></task-form>
         </div>
     </app-layout>

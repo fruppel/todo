@@ -38,9 +38,9 @@ export default {
                     this.groupedTasks[task.day].splice(index, 1);
                 }
             }
-            if (this.groupedTasks[task.day].length === 0) {
-                delete this.groupedTasks[task.day];
-            }
+            // if (this.groupedTasks[task.day].length === 0) {
+            //     delete this.groupedTasks[task.day];
+            // }
         },
 
         /**
