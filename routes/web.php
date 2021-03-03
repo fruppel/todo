@@ -7,6 +7,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('tasks/archive', [\App\Http\Controllers\TaskArchiveController::class, 'index'])->name('tasks.archive');
     Route::resource('tasks', \App\Http\Controllers\TaskController::class);
     Route::patch('tasks/updateOrder', [\App\Http\Controllers\TaskController::class, 'updateOrder'])->name('tasks.updateOrder');
     Route::patch('tasks/updateFinished/{task}', [\App\Http\Controllers\TaskController::class, 'updateFinished']);

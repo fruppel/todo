@@ -1,10 +1,10 @@
 <template>
     <div id="task-archive">
-        <span v-if="showNoTodos" class="text-gray-500">Keine Todos</span>
+        <span v-if="showNoTodos" class="text-gray-500 text-center">Keine Todos</span>
         <div v-for="(tasks, day) in groupedTasks">
             <strong>{{ showDay(day) }}</strong>
             <div v-for="task in tasks" class="card mb-1">
-                <task :item="task" @statusToggled="move($event)" @deleted="remove($event)"></task>
+                <task :item="task" @deleted="remove($event)"></task>
             </div>
         </div>
     </div>
