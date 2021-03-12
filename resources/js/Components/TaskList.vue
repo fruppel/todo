@@ -6,9 +6,19 @@
         </transition>
         <transition-group name="fade" tag="div">
             <div v-for="(tasks, day) in groupedTasks" :key="groupKey(day)" v-show="showDay(tasks)" class="mb-3">
-                <strong>{{ showFormattedDay(day) }}</strong>
-                <draggable :list="tasks" v-bind="getOptions()" @change="updateOrder">
-                    <transition-group name="bounce" tag="div" @after-leave="afterLeave(day)">
+                <task-section-headline :day="day"></task-section-headline>
+                <draggable
+                    :list="tasks"
+                    v-bind="getOptions()"
+                    @change="updateOrder"
+                    @start="drag = true"
+                    @end="drag = false"
+                >
+                    <transition-group
+                        :name="drag === false ? 'bounce' : null"
+                        tag="div"
+                        @after-leave="afterLeave(day)"
+                    >
                         <task v-for="task in tasks"
                               :item="task"
                               :key="task.id"
@@ -25,7 +35,8 @@
 
 <script>
 import draggable from 'vuedraggable';
-import Task from './Task';
+import Task from '@/Components/Task';
+import TaskSectionHeadline from '@/Components/TaskSectionHeadline';
 import Tasks from '../Mixins/Tasks';
 
 export default {
@@ -34,18 +45,20 @@ export default {
     mixins: [Tasks],
 
     components: {
-        Task, draggable
+        Task,
+        TaskSectionHeadline,
+        draggable
     },
 
     data() {
         return {
-            groupedTasks: this.todo
+            groupedTasks: this.todo,
+            drag: false
         }
     },
 
     computed: {
         showNoTodos() {
-            console.log('called showNoTodos');
             return Object.entries(this.groupedTasks).length === 0;
         },
     },
@@ -61,7 +74,7 @@ export default {
         updateOrder() {
             this.calculateIndices();
 
-            axios.patch(route('taskorder.update'), {
+            this.$http.patch(route('taskorder.update'), {
                 tasks: this.groupedTasks
             })
             .then(() => flash('Todo verschoben'))
@@ -69,7 +82,7 @@ export default {
         },
 
         showFormattedDay(day) {
-            return moment(day, 'YYYY-MM-DD').format('dddd, DD.MM.YYYY');
+
         },
 
         archive(task) {

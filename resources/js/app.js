@@ -1,13 +1,15 @@
-require('./bootstrap');
-
-// Import modules...
-import Vue from 'vue';
-import { App as InertiaApp, plugin as InertiaPlugin } from '@inertiajs/inertia-vue';
+import axios from 'axios';
 import PortalVue from 'portal-vue';
+import Vue from 'vue';
+import VueAxios from 'vue-axios';
+import { App as InertiaApp, plugin as InertiaPlugin } from '@inertiajs/inertia-vue';
+
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 Vue.mixin({ methods: { route } });
 Vue.use(InertiaPlugin);
 Vue.use(PortalVue);
+Vue.use(VueAxios, axios);
 
 const app = document.getElementById('app');
 
@@ -29,10 +31,10 @@ new Vue({
 }).$mount(app);
 
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
+    window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(
-            function(registration) {},
-            function(err) {
+            (registration) => {},
+            (err) => {
                 console.error('ServiceWorker registration failed: ', err);
             });
     });
