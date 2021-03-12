@@ -26,7 +26,8 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
-        "moment": "^2.29.1",
-        "vuedraggable": "^2.23.2"
+        "date-fns": "^2.19.0",
+        "vue-axios": "^3.2.4",
+        "vuedraggable": "^2.24.3"
     }
 }

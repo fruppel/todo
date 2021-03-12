@@ -16,7 +16,7 @@ class TaskController extends Controller
     {
         $todo = Task::whereFinished(false)
             ->whereUserId(auth()->id())
-            ->orderBy('day', 'asc')
+            ->orderByRaw('if(day is null,1,0), day asc')
             ->orderBy('order', 'asc')
             ->get()
             ->groupBy('day');
@@ -38,12 +38,12 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-        Validator::make($request->all(), [
+        $validatedRequest = Validator::make($request->all(), [
             'description' => 'required',
-            'day' => 'required',
+            'day' => '',
         ])->validateWithBag('storeTask');
 
-        Task::create(request()->all() + ['user_id' => auth()->id()]);
+        Task::create($validatedRequest + ['user_id' => auth()->id()]);
 
         return Redirect::route('tasks.index');
     }
@@ -52,7 +52,7 @@ class TaskController extends Controller
     {
         $validatedRequest = $request->validate([
             'description' => 'required',
-            'day' => 'required',
+            'day' => ''
         ]);
 
         $task->update($validatedRequest);

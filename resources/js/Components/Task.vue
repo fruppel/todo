@@ -31,6 +31,9 @@
 </template>
 
 <script>
+import {
+    parse, isBefore} from 'date-fns';
+
 export default {
     props: ['item'],
 
@@ -38,7 +41,7 @@ export default {
         toggleStatus(task) {
             task.finished = !task.finished;
 
-            axios.patch('/tasks/updateFinished/' + task.id, {
+            this.$http.patch('/tasks/updateFinished/' + task.id, {
                 finished: task.finished
             }).then(() => {
                 if (task.finished) {
@@ -56,7 +59,7 @@ export default {
                 return;
             }
 
-            axios.delete('/tasks/' + task.id)
+            this.$http.delete('/tasks/' + task.id)
                 .then(() => {
                     this.$emit('deleted', task);
                     flash('Todo gelöscht');
@@ -70,9 +73,10 @@ export default {
         taskClass(item) {
             let classes = item.finished ? 'finished' : 'unfinished';
 
-            const parsedDate = moment(item.day, 'YYYY-MM-DD').startOf('day');
+            const parsedDate = parse(item.day, 'yyyy-MM-dd', new Date());
+            const today = (new Date()).setHours(0, 0, 0, 0);
 
-            if (parsedDate < moment().startOf('day') && !item.finished) {
+            if (isBefore(parsedDate, today) && !item.finished) {
                 classes += ' bg-yellow-200';
             } else {
                 classes += ' bg-white';
