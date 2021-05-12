@@ -18,7 +18,7 @@
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
         "portal-vue": "^2.1.7",
-        "postcss": "^8.1.14",
+        "postcss": "^8.2.10",
         "postcss-import": "^12.0.1",
         "tailwindcss": "^2.0.1",
         "vue": "^2.5.17",
